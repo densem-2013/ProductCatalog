@@ -1,15 +1,17 @@
 ﻿using ProductCatalog.DAL.Entities;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ProductCatalog.Services.Abstract
 {
-    public interface IUserService
+    public interface IUserService : IService<User>
     {
-        User Authenticate(string username, string password);
-        IEnumerable<User> GetAll();
-        User GetById(int id);
-        User Create(User user, string password);
-        void Update(User user, string password = null);
-        void Delete(int id);
+        Task<User> Authenticate(string username, string password);
+        Task<User> Create(User user, string password);
+        Task<User> Update(User user, string password = null);
+        Task<IEnumerable<string>> GetUserRoles(int userId);
+        Task<int> AddUserToRole(int userId, int roleId);
+        Task<int> RemoveUserFromRole(int userId, int roleId);
     }
 }

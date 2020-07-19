@@ -2,7 +2,7 @@
 
 namespace ProductCatalog.DAL.Entities
 {
-    public class User
+    public class User : IBaseEntity
     {
         public User()
         {
@@ -14,6 +14,7 @@ namespace ProductCatalog.DAL.Entities
         public string Username { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
+        public bool? Deleted { get; set; }
 
         public ICollection<UserRole> UserRoles { get; set; }
     }

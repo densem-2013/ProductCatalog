@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Text;
 
 namespace ProductCatalog.DAL.Helpers
 {
     public static class AppHelper
     {
+        private static ILogger logger;
+
         public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             if (password == null) throw new ArgumentNullException("password");
@@ -35,5 +38,7 @@ namespace ProductCatalog.DAL.Helpers
 
             return true;
         }
+
+        public static ILogger Logger { get => logger; set => logger = value; }
     }
 }

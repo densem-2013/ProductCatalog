@@ -19,7 +19,7 @@ namespace ProductCatalog.DAL
             // connect to sql server database
             options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"), x =>
             {
-                x.MigrationsAssembly("EvaluationTask.DAL");
+                x.MigrationsAssembly("ProductCatalog.DAL");
                 x.MigrationsHistoryTable("__EFMigrationsHistory", "dbo");
             });
         }
@@ -77,10 +77,10 @@ namespace ProductCatalog.DAL
 
             modelBuilder.Entity<ProductSpecField>(entity =>
             {
-                entity.HasKey(e => new { e.ProductId, e.SpecFieldId });
+                entity.Property(e => e.Id).UseIdentityColumn(1, 1);
 
                 entity.HasOne(d => d.Product)
-                          .WithMany(p => p.ProductSpecFields)
+                          .WithMany(p => p.SpecificationData)
                           .HasForeignKey(d => d.ProductId)
                           .HasConstraintName("FK_ProductSpecFields_ProductId");
 

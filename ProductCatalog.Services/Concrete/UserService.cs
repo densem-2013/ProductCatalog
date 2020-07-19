@@ -1,29 +1,33 @@
-﻿using ProductCatalog.DAL;
+﻿using Microsoft.EntityFrameworkCore;
+using ProductCatalog.DAL;
 using ProductCatalog.DAL.Entities;
 using ProductCatalog.DAL.Helpers;
 using ProductCatalog.Services.Abstract;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace ProductCatalog.Services.Concrete
 {
-    public class UserService : IUserService
+    public class UserService : Service<User>, IUserService
     {
-        private DataContext _context;
-
-        public UserService(DataContext context)
+        public UserService(DataContext context) : base(context)
         {
-            _context = context;
         }
 
-        public User Authenticate(string username, string password)
+        public async Task<int> AddUserToRole(int userId, int roleId)
+        {
+            await _db.UserRoles.AddAsync(new UserRole { UserId = userId, RoleId = roleId });
+
+            return await _db.SaveChangesAsync();
+        }
+
+        public async Task<User> Authenticate(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return null;
 
-            var user = _context.Users.SingleOrDefault(x => x.Username == username);
+            var user = await SingleOrDefaultAsync(x => x, x => x.Username == username, x => x.Include(u => u.UserRoles));
 
             // check if username exists
             if (user == null)
@@ -37,23 +41,13 @@ namespace ProductCatalog.Services.Concrete
             return user;
         }
 
-        public IEnumerable<User> GetAll()
-        {
-            return _context.Users;
-        }
-
-        public User GetById(int id)
-        {
-            return _context.Users.Find(id);
-        }
-
-        public User Create(User user, string password)
+        public async Task<User> Create(User user, string password)
         {
             // validation
             if (string.IsNullOrWhiteSpace(password))
                 throw new AppException("Password is required");
 
-            if (_context.Users.Any(x => x.Username == user.Username))
+            if (DbSet.Any(x => x.Username == user.Username))
                 throw new AppException("Username \"" + user.Username + "\" is already taken");
 
             byte[] passwordHash, passwordSalt;
@@ -62,15 +56,31 @@ namespace ProductCatalog.Services.Concrete
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            _context.Users.Add(user);
-            _context.SaveChanges();
-
-            return user;
+            return await Create(user);
         }
 
-        public void Update(User userParam, string password = null)
+        public async Task<IEnumerable<string>> GetUserRoles(int userId)
         {
-            var user = _context.Users.Find(userParam.Id);
+            return await SingleOrDefaultAsync(u => u.UserRoles.Select(r => r.Role.Name), u => u.Id == userId, t => t.Include(b => b.UserRoles).ThenInclude(r => r.Role));
+        }
+
+        public async Task<int> RemoveUserFromRole(int userId, int roleId)
+        {
+            var userRole = await _db.FindAsync<UserRole>(userId, roleId);
+
+            if (userRole != null)
+            {
+                _db.UserRoles.Remove(userRole);
+
+                return await _db.SaveChangesAsync();
+            }
+
+            return 0;
+        }
+
+        public async Task<User> Update(User userParam, string password = null)
+        {
+            var user = await GetByIdAsync(userParam.Id);
 
             if (user == null)
                 throw new AppException("User not found");
@@ -79,7 +89,7 @@ namespace ProductCatalog.Services.Concrete
             if (!string.IsNullOrWhiteSpace(userParam.Username) && userParam.Username != user.Username)
             {
                 // throw error if the new username is already taken
-                if (_context.Users.Any(x => x.Username == userParam.Username))
+                if (DbSet.Any(x => x.Username == userParam.Username))
                     throw new AppException("Username " + userParam.Username + " is already taken");
 
                 user.Username = userParam.Username;
@@ -102,18 +112,7 @@ namespace ProductCatalog.Services.Concrete
                 user.PasswordSalt = passwordSalt;
             }
 
-            _context.Users.Update(user);
-            _context.SaveChanges();
-        }
-
-        public void Delete(int id)
-        {
-            var user = _context.Users.Find(id);
-            if (user != null)
-            {
-                _context.Users.Remove(user);
-                _context.SaveChanges();
-            }
+            return await Update(userParam);
         }
     }
 }
