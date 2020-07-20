@@ -18,6 +18,7 @@ using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using ProductCatalog.DAL;
+using System.Threading.Tasks;
 
 namespace ProductCatalog.WebApi
 {
@@ -35,6 +36,7 @@ namespace ProductCatalog.WebApi
         {
             services.AddDbContext<DataContext>();
 
+            services.AddCors();
             services.AddControllers();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -55,19 +57,17 @@ namespace ProductCatalog.WebApi
             {
                 x.Events = new JwtBearerEvents
                 {
-                    OnTokenValidated = async context =>
+                    OnTokenValidated = context =>
                     {
                         var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
                         var userId = int.Parse(context.Principal.Identity.Name);
-                        var user = await userService.GetByIdAsync(userId);
+                        var user = userService.GetByIdAsync(userId).Result;
                         if (user == null)
                         {
                             // return unauthorized if user no longer exists
                             context.Fail("Unauthorized");
-
-                            return;
                         }
-                        context.Success();
+                        return Task.CompletedTask;
                     }
                 };
                 x.RequireHttpsMetadata = false;
@@ -111,6 +111,7 @@ namespace ProductCatalog.WebApi
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

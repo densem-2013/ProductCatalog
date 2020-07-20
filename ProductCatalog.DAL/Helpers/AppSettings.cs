@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ProductCatalog.DAL.Helpers
+﻿namespace ProductCatalog.DAL.Helpers
 {
     public class AppSettings
     {

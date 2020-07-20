@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProductCatalog.DAL.Entities
 {
+    [Table("User")]
     public class User : IBaseEntity, ISoftDelete
     {
         public User()

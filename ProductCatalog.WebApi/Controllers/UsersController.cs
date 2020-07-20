@@ -8,6 +8,7 @@ using ProductCatalog.DAL.Helpers;
 using ProductCatalog.DAL.Models.Users;
 using ProductCatalog.Services.Abstract;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -53,19 +54,20 @@ namespace ProductCatalog.WebApi.Controllers
 
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
+            var claims = new List<Claim>(new[]
+                {
+                    new Claim(ClaimTypes.Name, user.Id.ToString()),
+                });
             var roleClaims = user.UserRoles.Select(r => new Claim(ClaimTypes.Role, r.Role.Name));
+
+            claims.AddRange(roleClaims);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
-
-            tokenDescriptor.Subject.AddClaims(roleClaims);
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
