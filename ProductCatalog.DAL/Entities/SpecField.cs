@@ -2,7 +2,7 @@
 
 namespace ProductCatalog.DAL.Entities
 {
-    public class SpecField : IBaseEntity
+    public class SpecField : IBaseEntity, ISoftDelete
     {
         public SpecField()
         {

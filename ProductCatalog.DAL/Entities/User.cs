@@ -2,7 +2,7 @@
 
 namespace ProductCatalog.DAL.Entities
 {
-    public class User : IBaseEntity
+    public class User : IBaseEntity, ISoftDelete
     {
         public User()
         {

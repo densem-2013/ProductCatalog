@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ProductCatalog.Services.Abstract
 {
-    public interface IService<T> where T : IBaseEntity
+    public interface IService<T> where T : class, IBaseEntity
     {
         Task<T> GetByIdAsync(params object[] ids);
         Task<T> Create(T entity);
@@ -22,5 +22,10 @@ namespace ProductCatalog.Services.Abstract
             Expression<Func<T, bool>> filter,
             Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null,
             Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null);
+    }
+
+    public interface ISoftDeletable<T> where T : class, ISoftDelete
+    {
+        Task<int> SoftDelete(T entity);
     }
 }

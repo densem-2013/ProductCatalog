@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ProductCatalog.DAL.Entities;
-using ProductCatalog.DAL.Models.Categories;
+using ProductCatalog.DAL.Models.SpecialFields;
 using ProductCatalog.Services.Abstract;
 using System.Threading.Tasks;
 
@@ -14,21 +13,21 @@ namespace ProductCatalog.WebApi.Controllers
     [Authorize(Roles = "Manager")]
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class SpecialFieldsController : ControllerBase
     {
-        private readonly ICategoryService _categoryService;
+        private readonly ISpecificationFieldService _specFieldService;
         private readonly IMapper _mapper;
 
-        public CategoriesController(ICategoryService categoryService, IMapper mapper)
+        public SpecialFieldsController(ISpecificationFieldService specFieldService, IMapper mapper)
         {
-            _categoryService = categoryService;
+            _specFieldService = specFieldService;
             _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var result = await _categoryService.SelectAsync(c => _mapper.Map<CategoryModel>(c), c => c.Deleted != true, include: f => f.Include(s => s.SpecFields));
+            var result = await _specFieldService.SelectAsync(c => _mapper.Map<SpecFieldModel>(c), c => c.Deleted != true);
 
             return Ok(result);
         }
@@ -36,7 +35,7 @@ namespace ProductCatalog.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var result = await _categoryService.SingleOrDefaultAsync(c => _mapper.Map<CategoryModel>(c), c => c.Id == id, f => f.Include(s => s.SpecFields));
+            var result = await _specFieldService.SingleOrDefaultAsync(c => _mapper.Map<SpecFieldModel>(c), c => c.Id == id);
 
             if (result == null)
             {
@@ -47,57 +46,59 @@ namespace ProductCatalog.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] UpdateCategoryModel model)
+        public async Task<IActionResult> Post([FromBody] AddSpecFieldModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var category = _mapper.Map<Category>(model);
+            var specField = _mapper.Map<SpecField>(model);
 
-            category = await _categoryService.Create(category);
+            specField = await _specFieldService.Create(specField);
 
-            var view = _mapper.Map<CategoryModel>(category);
+            var view = _mapper.Map<SpecFieldModel>(specField);
 
             return Ok(view);
         }
 
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] UpdateCategoryModel model)
+        public async Task<IActionResult> Put(int id, [FromBody] AddSpecFieldModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var category = await _categoryService.GetByIdAsync(id);
+            var specField = await _specFieldService.GetByIdAsync(id);
 
-            if (category == null)
+            if (specField == null)
             {
                 return NotFound();
             }
 
-            category = _mapper.Map(model, category);
+            specField = _mapper.Map(model, specField);
 
-            category = await _categoryService.Update(category);
+            specField = await _specFieldService.Update(specField);
 
-            var view = _mapper.Map<CategoryModel>(category);
+            var view = _mapper.Map<SpecFieldModel>(specField);
 
             return Ok(view);
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var category = await _categoryService.GetByIdAsync(id);
+            var specField = await _specFieldService.GetByIdAsync(id);
 
-            if (category == null)
+            if (specField == null)
             {
                 return NotFound();
             }
 
-            await _categoryService.SoftDelete(category);
+            await _specFieldService.SoftDelete(specField);
 
             return Ok();
         }

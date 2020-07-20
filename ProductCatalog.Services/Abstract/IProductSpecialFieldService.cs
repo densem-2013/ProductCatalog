@@ -2,7 +2,7 @@
 
 namespace ProductCatalog.Services.Abstract
 {
-    public interface ICategoryService : IService<Category>, ISoftDeletable<Category>
+    public interface IProductSpecialFieldService : IService<ProductSpecField>
     {
     }
 }

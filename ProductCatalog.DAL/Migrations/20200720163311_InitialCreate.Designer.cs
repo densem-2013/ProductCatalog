@@ -10,8 +10,8 @@ using ProductCatalog.DAL;
 namespace ProductCatalog.DAL.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200719221032_InitialDataStoreCreating")]
-    partial class InitialDataStoreCreating
+    [Migration("20200720163311_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,15 +28,18 @@ namespace ProductCatalog.DAL.Migrations
                         .HasAnnotation("SqlServer:IdentitySeed", 1)
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("Description")
+                    b.Property<bool?>("Deleted")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Name")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("ProductCatalog.DAL.Entities.Product", b =>
@@ -51,6 +54,9 @@ namespace ProductCatalog.DAL.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool?>("Deleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
@@ -59,7 +65,7 @@ namespace ProductCatalog.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
+                    b.ToTable("Product");
                 });
 
             modelBuilder.Entity("ProductCatalog.DAL.Entities.ProductSpecField", b =>
@@ -86,7 +92,7 @@ namespace ProductCatalog.DAL.Migrations
 
                     b.HasIndex("SpecFieldId");
 
-                    b.ToTable("ProductSpecFields");
+                    b.ToTable("ProductSpecField");
                 });
 
             modelBuilder.Entity("ProductCatalog.DAL.Entities.Role", b =>
@@ -98,19 +104,15 @@ namespace ProductCatalog.DAL.Migrations
                         .HasAnnotation("SqlServer:IdentitySeed", 1)
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<bool?>("Deleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Manager"
-                        });
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("ProductCatalog.DAL.Entities.SpecField", b =>
@@ -125,6 +127,9 @@ namespace ProductCatalog.DAL.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool?>("Deleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
@@ -132,7 +137,7 @@ namespace ProductCatalog.DAL.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("SpecFields");
+                    b.ToTable("SpecField");
                 });
 
             modelBuilder.Entity("ProductCatalog.DAL.Entities.User", b =>
@@ -143,6 +148,9 @@ namespace ProductCatalog.DAL.Migrations
                         .HasAnnotation("SqlServer:IdentityIncrement", 1)
                         .HasAnnotation("SqlServer:IdentitySeed", 1)
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool?>("Deleted")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("TEXT");
@@ -161,18 +169,7 @@ namespace ProductCatalog.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FirstName = "Manager",
-                            LastName = "User",
-                            PasswordHash = new byte[] { 15, 224, 85, 241, 126, 39, 247, 84, 253, 108, 11, 153, 238, 114, 188, 215, 172, 153, 96, 109, 36, 43, 236, 249, 10, 32, 216, 159, 111, 102, 70, 199, 103, 35, 152, 32, 236, 29, 132, 72, 131, 246, 207, 80, 237, 207, 166, 202, 79, 153, 8, 96, 78, 243, 158, 6, 167, 229, 78, 175, 250, 62, 103, 213 },
-                            PasswordSalt = new byte[] { 164, 161, 184, 169, 95, 67, 12, 176, 27, 46, 247, 231, 107, 49, 95, 88, 248, 39, 20, 24, 147, 101, 141, 55, 7, 89, 225, 188, 185, 44, 128, 145, 247, 182, 70, 107, 207, 31, 174, 8, 170, 97, 74, 47, 215, 11, 152, 216, 96, 144, 54, 5, 116, 82, 235, 61, 52, 19, 12, 120, 65, 39, 3, 189, 168, 70, 70, 72, 74, 188, 254, 118, 225, 187, 40, 48, 199, 32, 27, 40, 162, 170, 103, 10, 103, 118, 68, 157, 9, 110, 164, 12, 39, 49, 188, 104, 61, 10, 161, 22, 203, 205, 230, 206, 69, 117, 7, 6, 201, 79, 99, 141, 110, 175, 234, 151, 131, 59, 116, 73, 121, 80, 146, 220, 215, 67, 61, 77 },
-                            Username = "admin"
-                        });
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("ProductCatalog.DAL.Entities.UserRole", b =>
@@ -187,14 +184,7 @@ namespace ProductCatalog.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserRoles");
-
-                    b.HasData(
-                        new
-                        {
-                            RoleId = 1,
-                            UserId = 1
-                        });
+                    b.ToTable("UserRole");
                 });
 
             modelBuilder.Entity("ProductCatalog.DAL.Entities.ProductSpecField", b =>

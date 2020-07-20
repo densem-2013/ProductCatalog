@@ -7,6 +7,7 @@ namespace ProductCatalog.DAL.Helpers
     public static class AppHelper
     {
         private static ILogger logger;
+        public static ILogger Logger { get => logger; set => logger = value; }
 
         public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
@@ -39,6 +40,5 @@ namespace ProductCatalog.DAL.Helpers
             return true;
         }
 
-        public static ILogger Logger { get => logger; set => logger = value; }
     }
 }

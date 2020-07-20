@@ -27,7 +27,7 @@ namespace ProductCatalog.Services.Concrete
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return null;
 
-            var user = await SingleOrDefaultAsync(x => x, x => x.Username == username, x => x.Include(u => u.UserRoles));
+            var user = await SingleOrDefaultAsync(x => x, x => x.Username == username, x => x.Include(u => u.UserRoles).ThenInclude(y => y.Role));
 
             // check if username exists
             if (user == null)
@@ -114,5 +114,15 @@ namespace ProductCatalog.Services.Concrete
 
             return await Update(userParam);
         }
+
+        public async Task<int> SoftDelete(User entity)
+        {
+            entity.Deleted = true;
+
+            DbSet.Update(entity);
+
+            return await _db.SaveChangesAsync();
+        }
+
     }
 }

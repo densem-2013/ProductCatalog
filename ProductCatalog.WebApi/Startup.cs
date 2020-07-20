@@ -64,7 +64,10 @@ namespace ProductCatalog.WebApi
                         {
                             // return unauthorized if user no longer exists
                             context.Fail("Unauthorized");
+
+                            return;
                         }
+                        context.Success();
                     }
                 };
                 x.RequireHttpsMetadata = false;
@@ -79,7 +82,11 @@ namespace ProductCatalog.WebApi
             });
 
             // configure DI for application services
-            services.AddScoped<IUserService, UserService>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ICategoryService, CategoryService>();
+            services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<ISpecificationFieldService, SpecificationFieldService>();
+            services.AddTransient<IProductSpecialFieldService, ProductSpecialFieldService>();
 
             services.AddSwaggerGen(options =>
             {
@@ -93,7 +100,7 @@ namespace ProductCatalog.WebApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory, DataContext dbContext)
         {
             if (env.IsDevelopment())
             {
@@ -110,6 +117,8 @@ namespace ProductCatalog.WebApi
             {
                 endpoints.MapControllers();
             });
+
+            DatabaseInitializer.Initialize(dbContext);
 
             app.UseSwagger();
             app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v2/swagger.json", "Product Catalog Services"));

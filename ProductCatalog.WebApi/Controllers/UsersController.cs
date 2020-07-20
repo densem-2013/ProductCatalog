@@ -112,7 +112,7 @@ namespace ProductCatalog.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var users = await _userService.SelectAsync(u => _mapper.Map<UserModel>(u));
+            var users = await _userService.SelectAsync(u => _mapper.Map<UserModel>(u), u => u.Deleted != true);
 
             return Ok(users);
         }
@@ -162,7 +162,16 @@ namespace ProductCatalog.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            return await _userService.Delete(id) > 0 ? Ok() : (IActionResult)BadRequest();
+            var user = await _userService.GetByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            await _userService.SoftDelete(user);
+
+            return Ok();
         }
     }
 }

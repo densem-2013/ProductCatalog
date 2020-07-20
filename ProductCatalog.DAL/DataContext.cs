@@ -34,6 +34,11 @@ namespace ProductCatalog.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                modelBuilder.Entity(entityType.ClrType).ToTable(entityType.ClrType.Name);
+            }
+
             modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.Id).UseIdentityColumn(1, 1);
@@ -99,19 +104,6 @@ namespace ProductCatalog.DAL
                           .HasConstraintName("FK_SpecFields_CategoryId");
 
             });
-
-            modelBuilder.Entity<Role>().HasData(new Role { Id = 1, Name = "Manager" });
-
-            byte[] passwordHash, passwordSalt;
-
-            AppHelper.CreatePasswordHash("admin", out passwordHash, out passwordSalt);
-
-            var user = new User { Id = 1, Username = "admin", FirstName = "Manager", LastName = "User", PasswordHash = passwordHash, PasswordSalt = passwordSalt };
-
-            modelBuilder.Entity<User>().HasData(user);
-
-            modelBuilder.Entity<UserRole>().HasData(new UserRole { UserId = 1, RoleId = 1 });
-
         }
     }
 }

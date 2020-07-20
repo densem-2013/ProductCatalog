@@ -9,6 +9,8 @@
     <Compile Remove="Migrations\20200715205219_InitialCreate.Designer.cs" />
     <Compile Remove="Migrations\20200719220654_ProductSpecField_Entity_Updated.cs" />
     <Compile Remove="Migrations\20200719220654_ProductSpecField_Entity_Updated.Designer.cs" />
+    <Compile Remove="Migrations\20200720162813_InitialCreate.cs" />
+    <Compile Remove="Migrations\20200720162813_InitialCreate.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,10 +18,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.6" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\Products\" />
   </ItemGroup>
 
 </Project>

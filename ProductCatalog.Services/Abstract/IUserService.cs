@@ -1,11 +1,10 @@
 ﻿using ProductCatalog.DAL.Entities;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ProductCatalog.Services.Abstract
 {
-    public interface IUserService : IService<User>
+    public interface IUserService : IService<User>, ISoftDeletable<User>
     {
         Task<User> Authenticate(string username, string password);
         Task<User> Create(User user, string password);
